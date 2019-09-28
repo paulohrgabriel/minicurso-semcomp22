@@ -28,6 +28,7 @@ ae_v1 <- function(tc, ng) {
   #  (no momento, é o primeiro)
   melhor_crom = cromossomo
   
+  # Imprime informações sobre o primeiro indivíduo (geração 0)
   cat(0, "\t", nbits, "\t", cromossomo, "\n")
 
   # Início do processo evolutivo
