@@ -1,9 +1,13 @@
-# Parâmtros do problema da mochila
+# Parâmtros globais do problema da mochila
 lucros = c(10, 20, 15, 2, 30, 10, 30)
 pesos  = c( 1,  5, 10, 1,  7,  5,  1)
 capacidade = 20
 
-# Cálculo do valor da aptidão do indivíduo
+# Função objetivo
+# Entrada: Um cromossomo binário
+# Saída:
+# - valor do lucro da mochila, se a soma dos pesos respeita sua capacidade
+# - 0, caso contrário
 mochila <- function(cromossomo) {
     peso = 0
     lucro = 0
@@ -26,11 +30,20 @@ mochila <- function(cromossomo) {
     }
 }
 
+# Algoritmo evolutivo para o problema da mochila
+# Esse algoritmo avalia uma população de indivíduos
+# Aplica os operadores genéticos
+# Entrada:
+# - tamanho da população    (tp)
+# - tamanho do cromossomo   (tc)
+# - número de gerações      (ng)
+# Saída:
+# - média e desvio-padrão da população final
+# - também imprime a população final
 ae_mochila <- function(tp, tc, ng) {
-  
+
   # Cria uma população (matrix) de individuos
   pop <- matrix(round(runif(tp * tc)), nrow = tp)
-  print(pop)
 
   # Cria um array para armazenar as aptidões
   fitness <- c()
@@ -40,45 +53,56 @@ ae_mochila <- function(tp, tc, ng) {
   for (i in 1:nrow(pop)) {
     fitness = c(fitness, mochila(pop[i,]))
   }
-  print(max(fitness))
 
+  # Imprime a aptidão do melhor indivíduo, do pior e a média
+  cat(0, "\t", max(fitness), "\t", mean(fitness), "\t", min(fitness), "\n")
+    
   # Inicia o processo evolutivo
   for (i in 1:ng) {
+    # Seleciona dois indivíduos para reprodução
     reprodutor <- sample(nrow(pop), 2)
-
+    
+    # Seleciona um ponto para ocorrer o crossover
     pcross <- sample(tc-1, 1)
     
-f1 <- c(pop[reprodutor[1], 1:pcross],
-            pop[reprodutor[2], (pcross+1):7])
-f2 <- c(pop[reprodutor[2], 1:pcross],
-            pop[reprodutor[1], (pcross+1):7])
-
-#print(pop[reprodutor[1],])
-#print(pop[reprodutor[2],])
-#print(f1)
-#print(f2)
-
-pmut <- sample(7, 1, replace=TRUE)
-
-f1[pmut] <- !f1[pmut]
-
-pmut <- sample(7, 1, replace=TRUE)
-f2[pmut] <- !f2[pmut]
-
-fitness_f1 <- sum(f1)
-fitness_f2 <- sum(f2)
-
-pos <- order(fitness)[1:2]
-if (fitness_f1 > fitness[pos[1]]) {
-    pop[pos[1],] <- f1
-    fitness[pos[1]] = fitness_f1
+    # Aplica o crossover de 1-ponto, gerando dois filhos
+    f1 <- c(pop[reprodutor[1], 1:pcross],
+                pop[reprodutor[2], (pcross+1):tc])
+    f2 <- c(pop[reprodutor[2], 1:pcross],
+                pop[reprodutor[1], (pcross+1):tc])
     
-}
-if (fitness_f2 > fitness[pos[2]]) {
-    pop[pos[2],] <- f2
-    fitness[pos[2]] = fitness_f2
+    # Seleciona um gene do filho 1 para sofre mutação
+    pmut <- sample(tc, 1, replace=TRUE)
+    f1[pmut] <- !f1[pmut]
     
-}
-print(max(fitness))
+    # Seleciona um gene do filho 2 para sofre mutação
+    pmut <- sample(tc, 1, replace=TRUE)
+    f2[pmut] <- !f2[pmut]
+    
+    # Calcula o fitness de cada filho
+    fitness_f1 <- mochila(f1)
+    fitness_f2 <- mochila(f2)
+    
+    # Encontra os dois indivíduos de menor fitness na população
+    pos <- order(fitness)[1:2]
+    
+    # Se os filhos têm melhor fitness que os dois piores indivíduos
+    #  então realiza uma substituição
+    if (fitness_f1 > fitness[pos[1]]) {
+      pop[pos[1],] <- f1
+      fitness[pos[1]] = fitness_f1
+    }
+    if (fitness_f2 > fitness[pos[2]]) {
+      pop[pos[2],] <- f2
+      fitness[pos[2]] = fitness_f2
+    }
+    
+    # Imprime a aptidão do melhor indivíduo, do pior e a média
+    cat(i, "\t", max(fitness), "\t", mean(fitness), "\t", min(fitness), "\n")
   }
+  
+  cat("\n População final:\n")
+  print(pop)
+  
+  return(c(mean(fitness), sd(fitness)))
 }
