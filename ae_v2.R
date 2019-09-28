@@ -6,8 +6,7 @@
 # - tamanho do cromossomo (tc)
 # - número de gerações    (ng)
 # Saída:
-# - geração onde a melhor solução foi encontrada
-# - número de bits da melhor solução
+# - média e desvio do fitness da população final
 ae_v2 <- function(tp, tc, ng) {
   
   # Cria uma população de indivíduos
@@ -24,7 +23,8 @@ ae_v2 <- function(tp, tc, ng) {
     fitness = c(fitness, sum(pop[i,]))
   }
   
-  print(max(fitness))
+  # Imprime a aptidão do melhor indivíduo, do pior e a média
+  cat(0, "\t", max(fitness), "\t", mean(fitness), "\t", min(fitness), "\n")
   
   # Início do processo evolutivo
   
@@ -67,11 +67,10 @@ ae_v2 <- function(tp, tc, ng) {
       fitness[pos[2]] = fitness_f2
     }
     
-    # Recalcula o fitness de cada indivíduo da 
-    #fitness <- c()
-    #for (i in 1:nrow(pop)) {
-    #  fitness = c(fitness, sum(pop[i,]))
-    #}
-    print(max(fitness))
+    # Imprime a aptidão do melhor indivíduo, do pior e a média
+    cat(i, "\t", max(fitness), "\t", mean(fitness), "\t", min(fitness), "\n")
   }
+  
+  # Retorna o valor da média é do desvio-padrão
+  return(c(mean(fitness), sd(fitness)))
 }
